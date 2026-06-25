@@ -22,6 +22,9 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .container {
@@ -188,6 +191,7 @@ nav a:hover, nav a.active {
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .status-badge.lido { background-color: var(--status-lido); }
@@ -220,6 +224,33 @@ nav a:hover, nav a.active {
     margin-top: auto;
     border-top: 1px solid #eee;
     padding-top: 10px;
+}
+
+/* Estilo para o aviso de carregamento da API */
+.loading {
+    grid-column: 1 / -1; /* Faz ocupar a linha inteira da Grid */
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 40px 0;
+    animation: pulse 1.5s infinite;
+}
+
+/* Animação para dar efeito de piscada enquanto carrega */
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Mensagem de quando um filtro não tem livros */
+.no-books {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 40px 0;
 }
 
 /* Footer */
