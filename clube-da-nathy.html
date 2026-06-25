@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clube do Livro da Nathy</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <h1 class="logo">Clube do Livro da Nathy <span>📖</span></h1>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Início</a></li>
+                    <li><a href="#livros">Livros</a></li>
+                    <li><a href="#sobre">Sobre</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <h2>Bem-vinda(o) às nossas leituras!</h2>
+            <p>Acompanhe os livros lidos, as leituras atuais e as próximas metas do nosso clube de forma organizada.</p>
+            <a href="#livros" class="btn">Ver Livros</a>
+        </div>
+    </section>
+
+    <main class="container" id="livros">
+        <div class="section-header">
+            <h2>Nossa Estante</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="lido">Lidos</button>
+                <button class="filter-btn" data-filter="lendo">Lendo Atualmente</button>
+                <button class="filter-btn" data-filter="quero-ler">Próximas Leituras</button>
+            </div>
+        </div>
+
+        <div class="books-grid" id="books-container">
+            </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Clube do Livro da Nathy. Feito com 💜 para os amantes da leitura.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
