@@ -2,8 +2,8 @@
 const livrosBase = [
     {
         id: 1,
-        titulo: "Hábitos Atômicos",
-        autor: "James Clear",
+        titulo: "A quarta asa",
+        autor: "Rebecca Yarros",
         status: "lendo",
         statusTexto: "Lendo Atualmente",
         comentario: "Excelente leitura para começar o ano com foco e organização!"
@@ -26,8 +26,8 @@ const livrosBase = [
     },
     {
         id: 4,
-        titulo: "Foco Roubado",
-        autor: "Johann Hari",
+        titulo: "Inferno",
+        autor: "Dan Brown",
         status: "quero-ler",
         statusTexto: "Próxima Leitura",
         comentario: "Escolha do grupo para debater sobre atenção e redes sociais no próximo mês."
