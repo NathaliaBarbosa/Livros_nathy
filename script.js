@@ -2,8 +2,8 @@
 const livrosBase = [
     {
         id: 1,
-        titulo: "Hábitos Atômicos",
-        autor: "James Clear",
+        titulo: "Inferno",
+        autor: "Dan Brown",
         status: "lendo",
         statusTexto: "Lendo Atualmente",
         comentario: "Excelente leitura para começar o ano com foco e organização!"
@@ -26,8 +26,8 @@ const livrosBase = [
     },
     {
         id: 4,
-        titulo: "Foco Roubado",
-        autor: "Johann Hari",
+        titulo: "A cabana",
+        autor: "William P Young",
         status: "quero-ler",
         statusTexto: "Próxima Leitura",
         comentario: "Escolha do grupo para debater sobre atenção e redes sociais no próximo mês."
@@ -50,7 +50,8 @@ async function buscarDadosDaAPI() {
     const promessas = livrosBase.map(async (livro) => {
         // Monta a busca para a Open Library API usando título e autor
         const query = `title=${encodeURIComponent(livro.titulo)}&author=${encodeURIComponent(livro.autor)}`;
-        const url = `https://openlibrary.org/search.json?${query}`;
+        // Substitua a linha antiga da URL por esta:
+        const url = `https://openlibrary.org/search.json?${query}&_=${new Date().getTime()}`;
 
         try {
             const resposta = await fetch(url);
