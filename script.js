@@ -31,6 +31,14 @@ const livrosBase = [
         status: "quero-ler",
         statusTexto: "Próxima Leitura",
         comentario: "Escolha do grupo para debater sobre atenção e redes sociais no próximo mês."
+    },
+    {
+        id: 5,
+        titulo: "Novembro, 9",
+        autor: "Collen Hoover",
+        status: "lido",
+        statusTexto: "Próxima Leitura",
+        comentario: "Escolha do grupo para debater sobre atenção e redes sociais no próximo mês."
     }
 ];
 
