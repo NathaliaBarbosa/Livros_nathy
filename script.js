@@ -1,9 +1,14 @@
 // Base de dados local com as informações dos livros
-const livrosBase = [
+// =========================================
+// BASE DE DADOS INICIAL DOS LIVROS
+// ALTERADO
+// =========================================
+
+const livrosIniciais = [
     {
         id: 1,
-        titulo: "A quarta asa",
-        autor: "Rebecca Yarros",
+        titulo: "Torto Arado",
+        autor: "Itamar Vieira Junior",
         status: "lendo",
         statusTexto: "Lendo Atualmente",
         comentario: "Excelente leitura para começar o ano com foco e organização!"
@@ -34,6 +39,12 @@ const livrosBase = [
     }
 ];
 
+// NOVO
+// Recupera os livros salvos anteriormente.
+// Se não existir nenhum livro salvo,
+// utiliza os livros iniciais.
+let livrosBase = JSON.parse(localStorage.getItem('livros')) || livrosIniciais;
+
 // Variável para guardar os livros depois de buscar as imagens da API
 let livrosEnriquecidos = [];
 
@@ -41,47 +52,272 @@ let livrosEnriquecidos = [];
 const container = document.getElementById('books-container');
 const botoesFiltro = document.querySelectorAll('.filter-btn');
 
-// Função assíncrona que conecta na Open Library API
-async function buscarDadosDaAPI() {
-    // Mostra mensagem de carregamento
-    container.innerHTML = '<p class="loading">Buscando capas no acervo da Open Library... 📚</p>';
+// =========================================
+// ELEMENTOS DO FORMULÁRIO
+// NOVO
+// =========================================
 
-    // Cria uma lista de requisições para todos os livros ao mesmo tempo
+const btnAdicionarLivro = document.getElementById('btn-adicionar-livro');
+const formularioLivro = document.getElementById('formulario-livro');
+const formLivro = document.getElementById('form-livro');
+const btnCancelarLivro = document.getElementById('btn-cancelar-livro');
+
+
+// =========================================
+// SALVAR LIVROS NO LOCALSTORAGE
+// NOVO
+// =========================================
+
+function salvarLivros() {
+    localStorage.setItem('livros', JSON.stringify(livrosBase));
+}
+
+// =========================================
+// ABRIR FORMULÁRIO
+// NOVO
+// =========================================
+
+btnAdicionarLivro.addEventListener('click', () => {
+    formularioLivro.classList.toggle('hidden');
+});
+
+// =========================================
+// CANCELAR CADASTRO
+// NOVO
+// =========================================
+
+btnCancelarLivro.addEventListener('click', () => {
+    formularioLivro.classList.add('hidden');
+    formLivro.reset();
+});
+
+// =========================================
+// CADASTRAR NOVO LIVRO
+// NOVO
+// =========================================
+
+formLivro.addEventListener('submit', async (evento) => {
+
+    // Impede o recarregamento da página
+    evento.preventDefault();
+
+    // Captura os dados preenchidos pelo usuário
+    const titulo = document.getElementById('titulo').value.trim();
+    const autor = document.getElementById('autor').value.trim();
+    const status = document.getElementById('status').value;
+    const comentario = document.getElementById('comentario').value.trim();
+
+    // Define o texto que será exibido no card
+    const statusTextoMap = {
+        'lido': 'Lido',
+        'lendo': 'Lendo Atualmente',
+        'quero-ler': 'Próxima Leitura'
+    };
+
+    // Cria o novo livro
+    const novoLivro = {
+        id: Date.now(),
+        titulo,
+        autor,
+        status,
+        statusTexto: statusTextoMap[status],
+        comentario
+    };
+
+    // Adiciona o livro à lista principal
+    livrosBase.push(novoLivro);
+
+    // Salva a lista atualizada no localStorage
+    salvarLivros();
+
+    // Limpa o formulário
+    formLivro.reset();
+
+    // Esconde o formulário
+    formularioLivro.classList.add('hidden');
+
+    // IMPORTANTE:
+    // Busca novamente as capas usando a lista atualizada
+    // de livrosBase.
+    await buscarDadosDaAPI();
+});
+
+// =========================================
+// BUSCAR CAPAS DOS LIVROS NA OPEN LIBRARY
+// ALTERADO
+// =========================================
+
+async function buscarDadosDaAPI() {
+
+    // Mostra mensagem enquanto as capas são carregadas
+    container.innerHTML = `
+        <p class="loading">
+            Buscando capas no acervo da Open Library... 📚
+        </p>
+    `;
+
+    // Cria uma requisição para cada livro
     const promessas = livrosBase.map(async (livro) => {
-        // Monta a busca para a Open Library API usando título e autor
-        const query = `title=${encodeURIComponent(livro.titulo)}&author=${encodeURIComponent(livro.autor)}`;
-        const url = `https://openlibrary.org/search.json?${query}`;
 
         try {
+
+            // =========================================
+            // BUSCA O LIVRO PELO TÍTULO E AUTOR
+            // =========================================
+
+            const query = new URLSearchParams({
+                title: livro.titulo,
+                author: livro.autor
+            });
+
+            const url =
+                `https://openlibrary.org/search.json?${query.toString()}`;
+
+            console.log('Iniciando busca:', livro.titulo, livro.autor);
+            console.log('Resposta recebida:', livro.titulo);
             const resposta = await fetch(url);
+
+            if (!resposta.ok) {
+                throw new Error(`Erro HTTP: ${resposta.status}`);
+            }
+
             const dados = await resposta.json();
 
-            // Imagem padrão caso o livro não seja encontrado
-            let capaUrl = 'https://via.placeholder.com/280x350.png?text=Capa+Indisponível';
+            console.log(
+                `Resultados encontrados para "${livro.titulo}":`,
+                dados.docs
+            );
 
-            // Se a Open Library encontrou o livro e tem um ID de capa (cover_i)
-            if (dados.docs && dados.docs.length > 0) {
-                const coverId = dados.docs[0].cover_i;
-                if (coverId) {
-                    // Monta a imagem da capa: L significa Large (Grande)
-                    capaUrl = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+
+            // =========================================
+            // PROCURA PRIMEIRO UM RESULTADO COM cover_i
+            // =========================================
+
+            let livroEncontrado = dados.docs?.find(
+                doc => doc.cover_i
+            );
+
+
+            // =========================================
+            // SE NÃO ENCONTROU cover_i,
+            // PROCURA UM RESULTADO QUE TENHA ISBN
+            // =========================================
+
+            let isbn = null;
+
+            if (!livroEncontrado) {
+
+                const livroComIsbn = dados.docs?.find(
+                    doc => doc.isbn && doc.isbn.length > 0
+                );
+
+                if (livroComIsbn) {
+
+                    isbn = livroComIsbn.isbn[0];
+
+                    console.log(
+                        `Livro "${livro.titulo}" encontrado pelo ISBN:`,
+                        isbn
+                    );
                 }
             }
 
-            // Retorna o livro original mesclado com a nova capa
-            return { ...livro, capa: capaUrl };
+
+            // =========================================
+            // DEFINE A CAPA PADRÃO
+            // =========================================
+
+            let capaUrl =
+                'https://via.placeholder.com/280x350.png?text=Capa+Indisponível';
+
+
+            // =========================================
+            // OPÇÃO 1
+            // CAPA ENCONTRADA PELO cover_i
+            // =========================================
+
+            if (livroEncontrado?.cover_i) {
+
+                const coverId =
+                    livroEncontrado.cover_i;
+
+                capaUrl =
+                    `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+
+                console.log(
+                    `Capa encontrada para "${livro.titulo}" pelo cover_i:`,
+                    capaUrl
+                );
+            }
+
+
+            // =========================================
+            // OPÇÃO 2
+            // CAPA ENCONTRADA PELO ISBN
+            // =========================================
+
+            else if (isbn) {
+
+                capaUrl =
+                    `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+
+                console.log(
+                    `Capa encontrada para "${livro.titulo}" pelo ISBN:`,
+                    capaUrl
+                );
+            }
+
+
+            // =========================================
+            // SE NÃO ENCONTROU NENHUMA CAPA
+            // =========================================
+
+            else {
+
+                console.warn(
+                    `Nenhuma capa encontrada para "${livro.titulo}" - ${livro.autor}`
+                );
+            }
+
+
+            // =========================================
+            // RETORNA O LIVRO COM A CAPA
+            // =========================================
+
+            return {
+                ...livro,
+                capa: capaUrl
+            };
+
 
         } catch (erro) {
-            console.error(`Erro ao buscar o livro ${livro.titulo}:`, erro);
-            // Em caso de erro na conexão, retorna uma imagem de erro
-            return { ...livro, capa: 'https://via.placeholder.com/280x350.png?text=Erro+de+Conexão' };
+
+            console.error(
+                `Erro ao buscar capa de "${livro.titulo}":`,
+                erro
+            );
+
+            return {
+                ...livro,
+                capa:
+                    'https://via.placeholder.com/280x350.png?text=Erro+de+Conexão'
+            };
         }
     });
 
-    // Espera todas as buscas terminarem
-    livrosEnriquecidos = await Promise.all(promessas);
-    
-    // Renderiza a tela com as capas reais da API
+
+    // =========================================
+    // AGUARDA TODAS AS REQUISIÇÕES
+    // =========================================
+
+    livrosEnriquecidos =
+        await Promise.all(promessas);
+
+
+    // =========================================
+    // RENDERIZA OS LIVROS
+    // =========================================
+
     renderizarLivros(livrosEnriquecidos);
 }
 
@@ -132,7 +368,9 @@ botoesFiltro.forEach(botao => {
     });
 });
 
-// Inicializa a página disparando a busca na API
-document.addEventListener('DOMContentLoaded', () => {
-    buscarDadosDaAPI();
-});
+// =========================================
+// INICIALIZAÇÃO DA PÁGINA
+// ALTERADO
+// =========================================
+
+buscarDadosDaAPI();
