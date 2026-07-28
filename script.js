@@ -38,6 +38,7 @@ const livrosBase = [
 let livrosEnriquecidos = [];
 
 // Elementos do HTML
+// Lorem Ipsum
 const container = document.getElementById('books-container');
 const botoesFiltro = document.querySelectorAll('.filter-btn');
 
@@ -47,6 +48,7 @@ async function buscarDadosDaAPI() {
     container.innerHTML = '<p class="loading">Buscando capas no acervo da Open Library... 📚</p>';
 
     // Cria uma lista de requisições para todos os livros ao mesmo tempo
+    // Lorem Ipsum
     const promessas = livrosBase.map(async (livro) => {
         // Monta a busca para a Open Library API usando título e autor
         const query = `title=${encodeURIComponent(livro.titulo)}&author=${encodeURIComponent(livro.autor)}`;
@@ -79,6 +81,7 @@ async function buscarDadosDaAPI() {
     });
 
     // Espera todas as buscas terminarem
+    // Lorem Ipsum
     livrosEnriquecidos = await Promise.all(promessas);
     
     // Renderiza a tela com as capas reais da API
