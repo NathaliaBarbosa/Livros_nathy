@@ -34,12 +34,82 @@
     <main class="container" id="livros">
         <div class="section-header">
             <h2>Nossa Estante</h2>
+            
+            <!-- NOVO: botão para abrir o formulário de cadastro -->
+            <button id="btn-adicionar-livro" class="btn-add-book">
+                + Adicionar novo livro
+            </button>
+
             <div class="filters">
                 <button class="filter-btn active" data-filter="todos">Todos</button>
                 <button class="filter-btn" data-filter="lido">Lidos</button>
                 <button class="filter-btn" data-filter="lendo">Lendo Atualmente</button>
                 <button class="filter-btn" data-filter="quero-ler">Próximas Leituras</button>
             </div>
+        </div>
+
+        <!-- NOVO: formulário para cadastrar livros -->
+        <div id="formulario-livro" class="book-form-container hidden">
+
+            <h3>Adicionar novo livro</h3>
+
+            <form id="form-livro">
+
+                <div class="form-group">
+                    <label for="titulo">Título do livro</label>
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        placeholder="Digite o título do livro"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="autor">Autor</label>
+                    <input
+                        type="text"
+                        id="autor"
+                        name="autor"
+                        placeholder="Digite o nome do autor"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="lendo">Lendo Atualmente</option>
+                        <option value="lido">Lido</option>
+                        <option value="quero-ler">Próxima Leitura</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="comentario">Comentário</label>
+                    <textarea
+                        id="comentario"
+                        name="comentario"
+                        placeholder="Digite um comentário sobre o livro"
+                    ></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save-book">
+                        Adicionar livro
+                    </button>
+
+                    <button
+                        type="button"
+                        id="btn-cancelar-livro"
+                        class="btn-cancel-book"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+
+            </form>
         </div>
 
         <div class="books-grid" id="books-container">
